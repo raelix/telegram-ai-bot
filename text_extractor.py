@@ -40,7 +40,8 @@ class AWSTextExtractor:
         return loader.load()
 
     def _delete_document(self, filename: str):
-        uri = 's3://{bucket_name}/{filename}'.format(bucket_name=self.bucket_name, filename=filename)
-        # TODO:
-        # missing implementation
-        pass
+        # uri = 's3://{bucket_name}/{filename}'.format(bucket_name=self.bucket_name, filename=filename)
+        print("removing {}".format(filename))
+        session = self.session.client('s3')
+        session.delete_object(Bucket=self.bucket_name, Key=filename)
+        print("removal of {} completed".format(filename))

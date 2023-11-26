@@ -67,7 +67,7 @@ class VectorStoreWrapper:
         ret_docs = []
         print('creating questions')
         question_docs = questions(self.openai_api_key, documents)
-        print('creating summaries')
+        print('creating summary')
         summaries_docs = summaries(self.openai_api_key, documents)
         for i, question_list in enumerate(question_docs):
             ret_docs.extend(
@@ -79,7 +79,7 @@ class VectorStoreWrapper:
             )
         for doc in documents:
             doc.metadata["message_id"] = msg_id
-        print('done')
+        print('questions and summary created')
         self.db.vectorstore.add_documents(ret_docs)
         self.db.docstore.mset(list(zip(doc_ids, documents)))
 
@@ -87,7 +87,7 @@ class VectorStoreWrapper:
         retriever = MultiQueryRetriever.from_llm(
             retriever=self.db,
             llm=llm,
-            include_original=True
+            include_original=False
         )
         tool = create_retriever_tool(
             retriever,

@@ -49,11 +49,13 @@ class AgentWrapper:
     def run(self, query: str):
         result = self.agent({'input': query})
         # msg_id = _extract_id_from_intermediate_steps(result["intermediate_steps"])
+        msg_id = self.ch.msg_id
         output = dict(
             response=result['output'],
-            message_id=self.ch.msg_id
-            # message_id=msg_id
+            message_id=msg_id
         )
+        # Reset
+        self.ch.msg_id = None
         return output
 
     def add_document(self, docs: List[Document], msg_id: int, **kwargs: Any):
