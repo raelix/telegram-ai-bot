@@ -1,6 +1,7 @@
 from typing import List, Any
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema import Document
+from langchain.schema.callbacks.base import Callbacks
 from langchain.tools import Tool
 from langchain.vectorstores.chroma import Chroma
 from langchain.agents.agent_toolkits import create_retriever_tool
@@ -30,7 +31,7 @@ class VectorStoreWrapper:
 
     _NAME = "document-extractor"
     _DESCRIPTION = """This tool allows to extract useful personal stored information, all you need is here. 
-    Provide me an exhaustive sentence. Do your best to find an answer."""
+    Provide me an exhaustive sentence. Do your best to find an answer. The message_id field should be always returned."""
 
     def __init__(self, openai_api_key: str, user_id: str):
         _set_logger()
@@ -58,7 +59,7 @@ class VectorStoreWrapper:
         #     child_splitter=child_splitter,
         # )
 
-    def add_document(self, documents: List[Document], **kwargs: Any):
+    def add_document(self, documents: List[Document], msg_id: int, **kwargs: Any):
         # Parent Doc retriever
         # self.db.add_documents(documents, ids=None, **kwargs)
         # documents = self.splitter.split_documents(documents)
@@ -76,16 +77,22 @@ class VectorStoreWrapper:
             ret_docs.append(
                 Document(page_content=summary, metadata={self.id_key: doc_ids[i]})
             )
+        for doc in documents:
+            doc.metadata["message_id"] = msg_id
         print('done')
         self.db.vectorstore.add_documents(ret_docs)
         self.db.docstore.mset(list(zip(doc_ids, documents)))
 
-    def as_tool(self, llm) -> Tool:
+    def as_tool(self, llm, cm: Callbacks) -> Tool:
         retriever = MultiQueryRetriever.from_llm(
-            retriever=self.db, llm=llm
+            retriever=self.db,
+            llm=llm,
+            include_original=True
         )
-        return create_retriever_tool(
+        tool = create_retriever_tool(
             retriever,
             name=self._NAME,
             description=self._DESCRIPTION,
         )
+        tool.callbacks = cm
+        return tool

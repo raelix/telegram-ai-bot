@@ -55,13 +55,18 @@ class TelDocBot:
         memory_buffer = io.BytesIO(await file.download_as_bytearray())
         f_name = Path(file.file_path).name
         docs = self.aws_text_extractor.process_document(memory_buffer, f_name)
-        self.ai_manager.process_document(update.effective_user.username, docs)
+        self.ai_manager.process_document(update.effective_user.username, docs, update.message.id)
         await update.message.reply_text("👍", parse_mode=ParseMode.MARKDOWN, reply_to_message_id=update.message.id)
 
     async def questions(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = update.message.text
-        response = self.ai_manager.ask(update.effective_user.username, msg)
-        await update.message.reply_text(response)
+        output = self.ai_manager.ask(update.effective_user.username, msg)
+        response = output["response"]
+        if "message_id" in output:
+            msg_id = output["message_id"]
+            await update.message.reply_text(response, reply_to_message_id=msg_id)
+        else:
+            await update.message.reply_text(response)
 
     def get_message(self, update: Update, key: str, **kwargs):
         loc = self.get_locale(update)

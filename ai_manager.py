@@ -14,9 +14,9 @@ class AIManager:
             self.agents[user_id] = AgentWrapper(self.openai_api_key, user_id)
         return self.agents[user_id]
 
-    def process_document(self, user_id: str, docs: List[Document]):
+    def process_document(self, user_id: str, docs: List[Document], msg_id: int):
         agent = self.get_agent(user_id)
-        agent.add_document(docs)
+        agent.add_document(docs, msg_id)
 
     def ask(self, user_id: str, query: str):
         agent = self.get_agent(user_id)
