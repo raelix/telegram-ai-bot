@@ -1,0 +1,6 @@
+venv
+tests
+configuration.json
+production*
+__pycache__
+.idea
