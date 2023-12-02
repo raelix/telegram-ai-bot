@@ -30,8 +30,8 @@ class VectorStoreWrapper:
     id_key: str = "doc_id"
 
     _NAME = "document-extractor"
-    _DESCRIPTION = """This tool allows to extract useful personal stored information, all you need is here. 
-    Provide me an exhaustive sentence. Do your best to find an answer. The message_id field should be always returned."""
+    _DESCRIPTION = """This tool allows to extract personal stored information, all the user documents are available 
+    here. Provide me an exhaustive sentence. Do your best to find an answer."""
 
     def __init__(self, openai_api_key: str, user_id: str):
         _set_logger()
@@ -48,6 +48,7 @@ class VectorStoreWrapper:
             vectorstore=vector_store,
             docstore=store,
             id_key=self.id_key,
+            k=4,
         )
         # Parent Doc retriever
         # parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000)
@@ -83,7 +84,7 @@ class VectorStoreWrapper:
         self.db.vectorstore.add_documents(ret_docs)
         self.db.docstore.mset(list(zip(doc_ids, documents)))
 
-    def as_tool(self, llm, cm: Callbacks) -> Tool:
+    def as_tool(self, llm) -> Tool:
         retriever = MultiQueryRetriever.from_llm(
             retriever=self.db,
             llm=llm,
@@ -94,5 +95,4 @@ class VectorStoreWrapper:
             name=self._NAME,
             description=self._DESCRIPTION,
         )
-        tool.callbacks = cm
         return tool

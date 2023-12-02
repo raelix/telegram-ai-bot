@@ -45,9 +45,9 @@ class TelDocBot:
         return application
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print(len(context.user_data))
         await context.bot.send_message(chat_id=update.effective_chat.id,
-                                       text=self.get_message(update, "welcome", name=update.effective_user.username))
+                                       text=self.get_message(update, "welcome",
+                                                             name=update.effective_user.username))
 
     async def docs(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_chat_action(chat_id=update.message.chat_id, action='typing')
@@ -59,14 +59,19 @@ class TelDocBot:
         await update.message.reply_text("👍", parse_mode=ParseMode.MARKDOWN, reply_to_message_id=update.message.id)
 
     async def questions(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        c_message = await context.bot.send_message(chat_id=update.message.chat_id,
+                                                   text=self.get_message(update, "loading"),
+                                                   parse_mode=ParseMode.MARKDOWN)
+        await context.bot.send_chat_action(chat_id=update.message.chat_id, action='typing')
         msg = update.message.text
         output = self.ai_manager.ask(update.effective_user.username, msg)
         response = output["response"]
+        await c_message.delete()
         if "message_id" in output:
             msg_id = output["message_id"]
-            await update.message.reply_text(response, reply_to_message_id=msg_id)
+            await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, reply_to_message_id=msg_id)
         else:
-            await update.message.reply_text(response)
+            await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, )
 
     def get_message(self, update: Update, key: str, **kwargs):
         loc = self.get_locale(update)

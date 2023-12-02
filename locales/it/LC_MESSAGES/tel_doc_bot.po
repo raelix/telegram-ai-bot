@@ -1,2 +1,5 @@
 msgid "welcome"
 msgstr "ciao {name}!"
+
+msgid "loading"
+msgstr "caricamento..."
