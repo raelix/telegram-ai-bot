@@ -11,6 +11,8 @@ from langchain.storage._lc_store import create_kv_docstore
 import logging
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.retrievers.multi_vector import MultiVectorRetriever
+
+from chroma_docstore import ChromaStore
 from external_tools import questions, summaries
 from langchain.retrievers import ParentDocumentRetriever
 import chromadb
@@ -40,8 +42,8 @@ class VectorStoreWrapper:
         vector_store = Chroma(persist_directory=self.db_path,
                               embedding_function=self.embeddings,
                               collection_name=user_id)
-        fs = LocalFileStore("{}/{}".format(self.store_path, user_id))
-        store = create_kv_docstore(fs)
+        cs = ChromaStore(self.db_path, user_id)
+        store = create_kv_docstore(cs)
         # MultiVector - Summaries & Possible Questions
         self.splitter = RecursiveCharacterTextSplitter(chunk_size=2000)
         self.db = MultiVectorRetriever(
