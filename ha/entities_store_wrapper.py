@@ -59,7 +59,7 @@ class EntitiesStoreWrapper:
             questions separated by newlines. Original question: {question}""",
         )
         retriever = MultiQueryRetriever.from_llm(
-            retriever=self.db.as_retriever(k=7),
+            retriever=self.db.as_retriever(k=10),
             prompt=prompt,
             llm=llm,
             include_original=True

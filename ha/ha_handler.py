@@ -61,7 +61,7 @@ class HAHandler:
             friendly_name = item['attributes']['friendly_name']
             entity_id = item['entity_id']
             content = (
-                f"The entity with friendly name {friendly_name} is of type {d_type}, the identifier is {entity_id}"
+                f"The entity with friendly name \"{friendly_name}\" is of type {d_type}, the identifier is {entity_id}"
                 f" its type allow to get the current status")
             if d_type in services:
                 content += f" and it also allow to execute the following actions: {', '.join(services[d_type])}"

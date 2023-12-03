@@ -20,10 +20,10 @@ class HAStatusTool(BaseTool):
         ha_handler: HAHandler = self.metadata["ha_handler"]
         status = ha_handler.get_entity_status(entity_id)
         # attributes = ha_handler.get_entity_attributes(entity_id)
-        if not status:  # or not attributes:
+        if not status: #or not attributes:
             return ("Error while connecting to the home-assistant instance, "
                     "maybe the configuration is wrong")
-        return f"The entity status is {status}"  # and the other attributes are {attributes}"
+        return f"The entity status is {status}"#. Properties associated to this entity are {attributes}"
 
     def _arun(self, entity_id: str):
         raise NotImplementedError("home_assistant_status does not support async")

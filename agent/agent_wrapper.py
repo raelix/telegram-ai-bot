@@ -23,7 +23,7 @@ from vectorstore.vector_store_wrapper import VectorStoreWrapper
 class AgentWrapper:
     _temperature: int = 0
     _max_win_memory: int = 3
-    _agent_max_iterations: int = 25
+    _agent_max_iterations: int = 30
     _agent_max_execution_time: int = 60  # seconds
     _openai_timeout: int = 40  # seconds
     _memory_key: str = "memory"

@@ -118,16 +118,19 @@ class TelDocBot:
     async def commands(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         user_id = update.effective_user.username
         features_commands = self.ai_manager.get_available_feature_commands(user_id)
+        print("Features")
+        print(features_commands)
         keyboard = []
         for feature_name, feature_dict in features_commands.items():
-            command_description = list(feature_dict.values())[0]
-            command_name = list(feature_dict.keys())[0]
-            keyboard.append(
-                [InlineKeyboardButton(f"{feature_name} - {command_description}",
-                                      callback_data=json.dumps(dict(
-                                          feature=feature_name,
-                                          cmd_name=command_name))
-                                      )])
+            if len(feature_dict) > 0:
+                command_description = list(feature_dict.values())[0]
+                command_name = list(feature_dict.keys())[0]
+                keyboard.append(
+                    [InlineKeyboardButton(f"{feature_name} - {command_description}",
+                                          callback_data=json.dumps(dict(
+                                              feature=feature_name,
+                                              cmd_name=command_name))
+                                          )])
 
         keyboard.append([InlineKeyboardButton("Cancel", callback_data=json.dumps(
             dict(feature="cancel")))])
