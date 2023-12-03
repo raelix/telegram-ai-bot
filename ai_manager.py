@@ -21,3 +21,19 @@ class AIManager:
     def ask(self, user_id: str, query: str):
         agent = self.get_agent(user_id)
         return agent.run(query)
+
+    def get_features(self, user_id: str):
+        agent = self.get_agent(user_id)
+        return agent.get_features()
+
+    def get_feature_parameters(self, user_id: str, tool_name: str):
+        agent = self.get_agent(user_id)
+        return agent.get_feature_parameters(tool_name)
+
+    def enable_feature(self, user_id: str, tool_name: str, values: Dict[str, str]):
+        agent = self.get_agent(user_id)
+        return agent.enable_feature(tool_name, values)
+
+    def get_features_status(self, user_id: str):
+        agent = self.get_agent(user_id)
+        return agent.get_features_status()

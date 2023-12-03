@@ -1,8 +1,9 @@
 import io
 import logging
-from telegram import Update
+from typing import Dict
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.constants import ParseMode
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackQueryHandler, ConversationHandler
 from telegram.ext import MessageHandler, filters
 from pathlib import Path
 import gettext
@@ -22,6 +23,7 @@ logging.basicConfig(
 )
 
 config_file_path = 'configuration.json'
+CONFIGURE, STATUS, SWITCH, SETTING = range(4)
 
 
 class TelDocBot:
@@ -32,14 +34,31 @@ class TelDocBot:
                                                    configuration['aws_access_key_id'],
                                                    configuration['aws_secret_access_key'], configuration
                                                    ['bucket_name'])
-        self.application.run_polling()
+        self.application.run_polling(allowed_updates=Update.ALL_TYPES)
 
     def setup_application(self, bot_token: str):
         application = ApplicationBuilder().token(bot_token).build()
         start_handler = CommandHandler('start', self.start)
         doc_handler = MessageHandler(filters.Document.ALL, self.docs)
         questions_handler = MessageHandler(filters.ALL, self.questions)
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler("features", self.features)],
+            states={
+                SWITCH: [
+                    CallbackQueryHandler(self.status, pattern="^" + str(STATUS) + "$"),
+                    CallbackQueryHandler(self.configure, pattern="^" + str(CONFIGURE) + "$"),
+                ],
+                CONFIGURE: [
+                    CallbackQueryHandler(self.selected_feature),
+                ],
+                SETTING: [
+                    MessageHandler(filters.ALL, self.feature_setting),
+                ],
+            },
+            fallbacks=[CommandHandler("cancel", self.cancel)],
+        )
         application.add_handler(start_handler)
+        application.add_handler(conv_handler)
         application.add_handler(doc_handler)
         application.add_handler(questions_handler)
         return application
@@ -72,6 +91,96 @@ class TelDocBot:
             await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, reply_to_message_id=msg_id)
         else:
             await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, )
+
+    async def features(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        keyboard = [
+            [
+                InlineKeyboardButton("Configure", callback_data=str(CONFIGURE)),
+                InlineKeyboardButton("Status", callback_data=str(STATUS)),
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+        return SWITCH
+
+    async def configure(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        query = update.callback_query
+        await query.answer()
+        features = self.ai_manager.get_features(update.effective_user.username)
+        keyboard = []
+        for feature in features:
+            keyboard.append([InlineKeyboardButton(feature,
+                                                  callback_data=feature)
+                             ])
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text("Please choose one:", reply_markup=reply_markup)
+        return CONFIGURE
+
+    async def selected_feature(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        query = update.callback_query
+        await query.answer()
+        feature = query.data
+        user_id = update.effective_user.username
+        parameters = self.ai_manager.get_feature_parameters(user_id, feature)
+        if len(parameters) == 0:
+            self.enable_feature(user_id, feature, dict())
+            await query.edit_message_text(
+                "No parameters required, {} tool enabled.".format(feature),
+            )
+            return ConversationHandler.END
+        context.user_data["feature"] = feature
+        context.user_data["expected_parameters"] = parameters.keys()
+        context.user_data["available_parameters"] = dict()
+        context.user_data["current_parameter"] = list(parameters.keys())[0]
+        description = parameters[context.user_data["current_parameter"]]['description']
+        await query.edit_message_text(
+            f"Please type {description}:",
+        )
+        return SETTING
+
+    async def feature_setting(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        text = update.message.text
+        user_id = update.effective_user.username
+        feature = context.user_data["feature"]
+        key = context.user_data['current_parameter']
+        context.user_data["available_parameters"][key] = text
+        parameters = self.ai_manager.get_feature_parameters(user_id, feature)
+        for k, v in parameters.items():
+            if k not in context.user_data["available_parameters"]:
+                context.user_data['current_parameter'] = k
+                description = parameters[context.user_data["current_parameter"]]['description']
+                await update.message.reply_text(
+                    f"Please type {description}:",
+                )
+                return SETTING
+        self.enable_feature(user_id, feature, context.user_data["available_parameters"])
+        await update.message.reply_text("Configuration completed, {} feature enabled.".format(feature))
+        del context.user_data["feature"]
+        del context.user_data['current_parameter']
+        del context.user_data["available_parameters"]
+        return ConversationHandler.END
+
+    def enable_feature(self, user_id: str, feature: str, values: Dict[str, str]):
+        self.ai_manager.enable_feature(user_id, feature, values)
+
+    async def status(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        query = update.callback_query
+        await query.answer()
+        user_id = update.effective_user.username
+        features_status = self.ai_manager.get_features_status(user_id)
+        msg = "\n".join("- {} tool is {}".format(f_name, "enabled" if f_status else "disabled")
+                        for f_name, f_status in features_status.items())
+        await query.edit_message_text(msg)
+        return ConversationHandler.END
+
+    async def cancel(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        user = update.message.from_user
+        await update.message.reply_text(
+            "Bye! I hope we can talk again some day.", reply_markup=ReplyKeyboardRemove()
+        )
+
+        return ConversationHandler.END
 
     def get_message(self, update: Update, key: str, **kwargs):
         loc = self.get_locale(update)
