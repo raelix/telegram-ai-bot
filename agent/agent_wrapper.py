@@ -9,20 +9,21 @@ from langchain.tools import Tool
 from langchain.tools.render import format_tool_to_openai_function
 from langchain.agents.format_scratchpad import format_to_openai_function_messages
 from langchain.utils.openai_functions import convert_pydantic_to_openai_function
-from function_agent_output_parser import CustomOpenAIFunctionsAgentOutputParser, Response
+from agent.function_agent_output_parser import CustomOpenAIFunctionsAgentOutputParser, Response
 from settings.user_settings import UserSettings
 from tools.tools_manager import ToolsManager
-from vector_store_wrapper import VectorStoreWrapper
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.agents import AgentExecutor
 import utils
 import chromadb
 
+from vectorstore.vector_store_wrapper import VectorStoreWrapper
+
 
 class AgentWrapper:
     _temperature: int = 0
     _max_win_memory: int = 3
-    _agent_max_iterations: int = 10
+    _agent_max_iterations: int = 25
     _agent_max_execution_time: int = 60  # seconds
     _openai_timeout: int = 40  # seconds
     _memory_key: str = "memory"
@@ -120,5 +121,18 @@ class AgentWrapper:
         # Recreate the agent with new enabled tools
         self.agent_executor = self._init_agent()
 
+    def disable_feature(self, tool_name: str):
+        self.tools_manager.disable_tool(tool_name)
+        # Recreate the agent without disabled tool
+        self.agent_executor = self._init_agent()
+
     def get_features_status(self):
         return self.tools_manager.get_tools_status()
+
+    def get_available_feature_commands(self):
+        return self.tools_manager.get_available_tools_functions()
+
+    def call_feature_command(self, tool_name: str, command: str):
+        self.tools_manager.call_tool_function(tool_name=tool_name, function_name=command)
+        # Recreate the agent with the updated data
+        self.agent_executor = self._init_agent()

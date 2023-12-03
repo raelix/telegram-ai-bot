@@ -4,10 +4,9 @@ from urllib.parse import urljoin
 from typing import Dict, List
 from langchain.schema import Document
 
-
-STATES = "api/states"
-SERVICES = "api/services"
-
+# Tech debit - I don't really want to expose all the entities (e.g. the light of a wall switch)
+# I have more than 1000 entities, select what to keep is a mess, would be nice, maybe, to add a prefix
+# on the friendly_name and filter by prefix and/or domain
 FILTERS = [
     "switch.bagno_interruttore",
     "switch.camera_da_letto_interruttore",
@@ -43,6 +42,9 @@ ALLOWED_TYPES = [
 
 
 class HAHandler:
+    _states = "api/states"
+    _services = "api/services"
+
     def __init__(self, url: str, bearer_token: str, **kwargs):
         self.url = url
         self.bearer_token = bearer_token
@@ -59,7 +61,7 @@ class HAHandler:
             friendly_name = item['attributes']['friendly_name']
             entity_id = item['entity_id']
             content = (
-                f"The entity with friendly name {friendly_name} is of type {d_type} his identifier is {entity_id}"
+                f"The entity with friendly name {friendly_name} is of type {d_type}, the identifier is {entity_id}"
                 f" its type allow to get the current status")
             if d_type in services:
                 content += f" and it also allow to execute the following actions: {', '.join(services[d_type])}"
@@ -86,10 +88,10 @@ class HAHandler:
         return actions
 
     def get_entities(self):
-        return self.get_json_from_url(urljoin(self.url, STATES))
+        return self.get_json_from_url(urljoin(self.url, self._states))
 
     def get_services(self):
-        return self.get_json_from_url(urljoin(self.url, SERVICES))
+        return self.get_json_from_url(urljoin(self.url, self._services))
 
     def get_json_from_url(self, url):
         try:
@@ -110,7 +112,7 @@ class HAHandler:
             return None
 
     def set_state(self, entity_type: str, action: str, entity_id: str) -> bool:
-        url = urljoin(self.url, "{}/{}/{}".format(SERVICES, entity_type, action))
+        url = urljoin(self.url, "{}/{}/{}".format(self._services, entity_type, action))
         try:
             headers = {
                 "Authorization": f"Bearer {self.bearer_token}",
@@ -128,4 +130,3 @@ class HAHandler:
         except requests.exceptions.RequestException as e:
             print(f"An error occurred during the request: {e}")
             return False
-

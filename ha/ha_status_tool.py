@@ -1,8 +1,6 @@
 from typing import Type
-
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
-
 from ha.ha_handler import HAHandler
 
 
@@ -21,11 +19,11 @@ class HAStatusTool(BaseTool):
     def _run(self, entity_id: str):
         ha_handler: HAHandler = self.metadata["ha_handler"]
         status = ha_handler.get_entity_status(entity_id)
-        attributes = ha_handler.get_entity_attributes(entity_id)
-        if not status or not attributes:
+        # attributes = ha_handler.get_entity_attributes(entity_id)
+        if not status:  # or not attributes:
             return ("Error while connecting to the home-assistant instance, "
                     "maybe the configuration is wrong")
-        return "The entity status is {} and the other attributes are {}".format(status, attributes)
+        return f"The entity status is {status}"  # and the other attributes are {attributes}"
 
     def _arun(self, entity_id: str):
         raise NotImplementedError("home_assistant_status does not support async")

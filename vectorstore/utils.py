@@ -41,9 +41,9 @@ def questions(openai_api_key: str, docs: List[Document]):
                 "Generate a list of 3 hypothetical questions that the below document could be used to answer:\n\n{doc}"
             )
             | ChatOpenAI(openai_api_key=openai_api_key, temperature=0, max_retries=0, model=utils.AGENT_MODEL).bind(
-        functions=functions,
-        function_call={"name": "hypothetical_questions"}
-    )
+                functions=functions,
+                function_call={"name": "hypothetical_questions"}
+            )
             | JsonKeyOutputFunctionsParser(key_name="questions")
     )
     return chain.batch(docs, {"max_concurrency": 5})

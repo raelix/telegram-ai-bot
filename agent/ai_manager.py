@@ -1,6 +1,6 @@
 from typing import List, Dict
 from langchain.schema import Document
-from agent_wrapper import AgentWrapper
+from agent.agent_wrapper import AgentWrapper
 
 
 class AIManager:
@@ -26,14 +26,26 @@ class AIManager:
         agent = self.get_agent(user_id)
         return agent.get_features()
 
-    def get_feature_parameters(self, user_id: str, tool_name: str):
-        agent = self.get_agent(user_id)
-        return agent.get_feature_parameters(tool_name)
-
     def enable_feature(self, user_id: str, tool_name: str, values: Dict[str, str]):
         agent = self.get_agent(user_id)
         return agent.enable_feature(tool_name, values)
 
+    def disable_feature(self, user_id: str, tool_name: str):
+        agent = self.get_agent(user_id)
+        return agent.disable_feature(tool_name)
+
     def get_features_status(self, user_id: str):
         agent = self.get_agent(user_id)
         return agent.get_features_status()
+
+    def get_feature_parameters(self, user_id: str, tool_name: str):
+        agent = self.get_agent(user_id)
+        return agent.get_feature_parameters(tool_name)
+
+    def get_available_feature_commands(self, user_id: str):
+        agent = self.get_agent(user_id)
+        return agent.get_available_feature_commands()
+
+    def call_feature_command(self, user_id: str, tool_name: str, command: str):
+        agent = self.get_agent(user_id)
+        return agent.call_feature_command(tool_name, command)

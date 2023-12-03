@@ -1,21 +1,16 @@
 from typing import List, Any
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema import Document
-from langchain.schema.callbacks.base import Callbacks
 from langchain.tools import Tool
 from langchain.vectorstores.chroma import Chroma
 from langchain.agents.agent_toolkits import create_retriever_tool
-from langchain.storage import LocalFileStore
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.storage._lc_store import create_kv_docstore
 import logging
 from langchain.retrievers.multi_query import MultiQueryRetriever
 from langchain.retrievers.multi_vector import MultiVectorRetriever
-
-from chroma_docstore import ChromaStore
-from external_tools import questions, summaries
-from langchain.retrievers import ParentDocumentRetriever
-import chromadb
+from vectorstore.chroma_docstore import ChromaStore
+from vectorstore.utils import questions, summaries
 import utils
 import uuid
 

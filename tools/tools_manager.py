@@ -19,6 +19,7 @@ class ToolsManager:
         )
 
     def get_user_tools(self, **kwargs) -> List[Tool]:
+        self.instances = dict()
         tools: List[Tool] = []
         for tool_name, tool_type in self.classes.items():
             if self.user_settings.is_tool_enabled(tool_name):
@@ -57,13 +58,14 @@ class ToolsManager:
     def get_available_tools_functions(self):
         ret: Dict[str, Dict[str, str]] = dict()
         for instance_name, instance in self.classes.items():
-            ret[instance_name] = instance.get_available_functions()
+            if instance_name in self.instances:
+                ret[instance_name] = instance.get_available_functions()
         return ret
 
     def get_tools_status(self):
         ret: Dict[str, bool] = dict()
         for instance_name, instance in self.classes.items():
-            ret[instance_name] = instance_name in self.instances
+            ret[instance_name] = True if instance_name in self.instances else False
         return ret
 
     def call_tool_function(self, tool_name, function_name):
@@ -77,3 +79,6 @@ class ToolsManager:
         for k, v in parameters.items():
             self.user_settings.set_tool_parameter(k, v)
         self.user_settings.set_tool_enabled(tool_name, True)
+
+    def disable_tool(self, tool_name: str):
+        self.user_settings.set_tool_enabled(tool_name, False)

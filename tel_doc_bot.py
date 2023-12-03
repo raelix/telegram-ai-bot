@@ -9,8 +9,8 @@ from pathlib import Path
 import gettext
 import locale
 import json
-from ai_manager import AIManager
-from text_extractor import AWSTextExtractor
+from agent.ai_manager import AIManager
+from loader.text_extractor import AWSTextExtractor
 
 # process all for dir in $(ls -d locales/*);
 # do msgfmt $dir/LC_MESSAGES/tel_doc_bot.po -o $dir/LC_MESSAGES/tel_doc_bot.mo; done
@@ -23,7 +23,7 @@ logging.basicConfig(
 )
 
 config_file_path = 'configuration.json'
-CONFIGURE, STATUS, SWITCH, SETTING = range(4)
+CONFIGURE, STATUS, SWITCH, SETTING, DISABLE, COMMAND = range(6)
 
 
 class TelDocBot:
@@ -42,21 +42,32 @@ class TelDocBot:
         doc_handler = MessageHandler(filters.Document.ALL, self.docs)
         questions_handler = MessageHandler(filters.ALL, self.questions)
         conv_handler = ConversationHandler(
-            entry_points=[CommandHandler("features", self.features)],
+            entry_points=[
+                CommandHandler("features", self.features),
+                CommandHandler("commands", self.commands),
+            ],
             states={
                 SWITCH: [
                     CallbackQueryHandler(self.status, pattern="^" + str(STATUS) + "$"),
                     CallbackQueryHandler(self.configure, pattern="^" + str(CONFIGURE) + "$"),
+                    CallbackQueryHandler(self.disable, pattern="^" + str(DISABLE) + "$"),
                 ],
                 CONFIGURE: [
                     CallbackQueryHandler(self.selected_feature),
                 ],
+                DISABLE: [
+                    CallbackQueryHandler(self.disable_feature),
+                ],
                 SETTING: [
                     MessageHandler(filters.ALL, self.feature_setting),
+                ],
+                COMMAND: [
+                    CallbackQueryHandler(self.command_feature),
                 ],
             },
             fallbacks=[CommandHandler("cancel", self.cancel)],
         )
+
         application.add_handler(start_handler)
         application.add_handler(conv_handler)
         application.add_handler(doc_handler)
@@ -95,13 +106,77 @@ class TelDocBot:
     async def features(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         keyboard = [
             [
-                InlineKeyboardButton("Configure", callback_data=str(CONFIGURE)),
+                InlineKeyboardButton("Enable", callback_data=str(CONFIGURE)),
+                InlineKeyboardButton("Disable", callback_data=str(DISABLE)),
                 InlineKeyboardButton("Status", callback_data=str(STATUS)),
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+        await update.message.reply_text("Select an option:", reply_markup=reply_markup)
         return SWITCH
+
+    async def commands(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        user_id = update.effective_user.username
+        features_commands = self.ai_manager.get_available_feature_commands(user_id)
+        keyboard = []
+        for feature_name, feature_dict in features_commands.items():
+            command_description = list(feature_dict.values())[0]
+            command_name = list(feature_dict.keys())[0]
+            keyboard.append(
+                [InlineKeyboardButton(f"{feature_name} - {command_description}",
+                                      callback_data=json.dumps(dict(
+                                          feature=feature_name,
+                                          cmd_name=command_name))
+                                      )])
+
+        keyboard.append([InlineKeyboardButton("Cancel", callback_data=json.dumps(
+            dict(feature="cancel")))])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("Select an option:", reply_markup=reply_markup)
+        return COMMAND
+
+    async def disable(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        query = update.callback_query
+        await query.answer()
+        features = self.ai_manager.get_features_status(update.effective_user.username)
+        keyboard = []
+        for feature_name, enabled in features.items():
+            if enabled:
+                keyboard.append([InlineKeyboardButton(feature_name, callback_data=feature_name)])
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text("Please choose one feature to disable:", reply_markup=reply_markup)
+        return DISABLE
+
+    async def command_feature(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        query = update.callback_query
+        await query.answer()
+        commands_dict = json.loads(query.data)
+        user_id = update.effective_user.username
+        feature = commands_dict["feature"]
+        if feature == "cancel":
+            await query.edit_message_text("No problem.")
+            return ConversationHandler.END
+        cmd_name = commands_dict["cmd_name"]
+        await query.edit_message_text(
+            f"Calling...",
+        )
+        self.ai_manager.call_feature_command(user_id, feature, cmd_name)
+        await query.edit_message_text(
+            f"Call completed",
+        )
+        return ConversationHandler.END
+
+    async def disable_feature(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        query = update.callback_query
+        await query.answer()
+        feature = query.data
+        user_id = update.effective_user.username
+        self.ai_manager.disable_feature(user_id, feature)
+        await query.edit_message_text(
+            f"Feature {feature} disabled.",
+        )
+        return ConversationHandler.END
 
     async def configure(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
@@ -169,7 +244,7 @@ class TelDocBot:
         await query.answer()
         user_id = update.effective_user.username
         features_status = self.ai_manager.get_features_status(user_id)
-        msg = "\n".join("- {} tool is {}".format(f_name, "enabled" if f_status else "disabled")
+        msg = "\n".join("- {} tool is {}".format(f_name, "enabled" if f_status is True else "disabled")
                         for f_name, f_status in features_status.items())
         await query.edit_message_text(msg)
         return ConversationHandler.END

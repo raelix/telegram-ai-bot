@@ -27,11 +27,15 @@ class EntitiesStoreWrapper:
     def __init__(self, openai_api_key: str, user_id: str, ha_handler: HAHandler, **kwargs):
         _set_logger()
         self.openai_api_key = openai_api_key
+        self.user_id = user_id
         self.embeddings = OpenAIEmbeddings(openai_api_key=self.openai_api_key, model=utils.EMBEDDINGS_MODEL)
+        self.ha_handler = ha_handler
+        self._init_db()
+
+    def _init_db(self):
         self.db = Chroma(persist_directory=self.db_path,
                          embedding_function=self.embeddings,
-                         collection_name="entities_{}".format(user_id))
-        self.ha_handler = ha_handler
+                         collection_name="entities_{}".format(self.user_id))
 
     def add_document(self, documents: List[Document]):
         self.db.add_documents(documents)
@@ -39,6 +43,7 @@ class EntitiesStoreWrapper:
     def process_home_assistant_entities(self):
         self.db.delete_collection()
         docs = self.ha_handler.get_summary()
+        self._init_db()
         self.add_document(docs)
 
     def as_tool(self, llm, **kwargs) -> Tool:
@@ -54,7 +59,7 @@ class EntitiesStoreWrapper:
             questions separated by newlines. Original question: {question}""",
         )
         retriever = MultiQueryRetriever.from_llm(
-            retriever=self.db.as_retriever(),
+            retriever=self.db.as_retriever(k=7),
             prompt=prompt,
             llm=llm,
             include_original=True
