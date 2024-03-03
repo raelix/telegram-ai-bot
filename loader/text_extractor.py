@@ -2,7 +2,7 @@ import time
 from typing import List
 
 import boto3
-from langchain.document_loaders import AmazonTextractPDFLoader
+from langchain_community.document_loaders import AmazonTextractPDFLoader
 from langchain.schema import Document
 
 

@@ -1,0 +1,11 @@
+python-telegram-bot
+lark
+chromadb
+langchain
+langchain_openai
+langchain-community
+boto3
+pypika
+duckduckgo-search
+pydantic
+requests

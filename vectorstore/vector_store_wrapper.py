@@ -1,5 +1,5 @@
 from typing import List, Any
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.tools import Tool
 from langchain.vectorstores.chroma import Chroma

@@ -1,7 +1,7 @@
 from typing import List, Dict
-from langchain.tools import Tool
+from langchain_community.tools import Tool
 from tools.tool_instance import ToolInstance
-from langchain.tools import DuckDuckGoSearchRun
+from langchain_community.tools import DuckDuckGoSearchRun
 
 
 class DuckDuckGoTool(ToolInstance):

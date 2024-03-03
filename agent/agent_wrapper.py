@@ -1,14 +1,13 @@
 from typing import List, Any, Dict
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain.schema import Document, SystemMessage
 from langchain.schema.runnable import RunnableSerializable
 from langchain.tools import Tool
-from langchain.tools.render import format_tool_to_openai_function
 from langchain.agents.format_scratchpad import format_to_openai_function_messages
-from langchain.utils.openai_functions import convert_pydantic_to_openai_function
+from langchain_core.utils.function_calling import convert_to_openai_function
 from agent.function_agent_output_parser import CustomOpenAIFunctionsAgentOutputParser, Response
 from settings.user_settings import UserSettings
 from tools.tools_manager import ToolsManager
@@ -105,8 +104,8 @@ class AgentWrapper:
                     "memory": lambda x: x["memory"],
                 }
                 | prompt
-                | llm.bind(functions=[format_tool_to_openai_function(t) for t in tools] +
-                                     [convert_pydantic_to_openai_function(Response)])
+                | llm.bind(functions=[convert_to_openai_function(t) for t in tools] +
+                                     [convert_to_openai_function(Response)])
                 | CustomOpenAIFunctionsAgentOutputParser()
         )
 

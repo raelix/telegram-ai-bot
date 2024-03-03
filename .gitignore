@@ -2,6 +2,15 @@ venv
 tests
 configuration.json
 production*
+movies_database
 __pycache__
 .idea
 *.ipynb
+netflix.json
+/scraper/config/production.yaml
+/scraper/node_modules
+/scraper/session
+/scraper/.DS_Store
+/scraper/scraped.json
+/scraper/watched.json
+/scraper/netflix.json

@@ -1,6 +1,6 @@
 from typing import List
 
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.output_parsers.openai_functions import JsonKeyOutputFunctionsParser
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser, Document

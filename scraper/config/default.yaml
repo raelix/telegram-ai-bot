@@ -1,0 +1,93 @@
+login:
+  username: username
+  password: password
+  profile: myprofile
+activity:
+  enabled: true
+scrape:
+  enabled: true
+  appendToExisting: true
+details:
+  enabled: true
+genres:
+#Thriller
+- 8933
+- 43048
+- 46588
+- 10499
+- 10306
+- 31851
+- 3269
+- 9994
+- 10504
+- 5505
+- 11014
+- 9147
+- 972
+- 11140
+#Action
+- 43040
+- 1568
+- 43048
+- 7442
+- 77232
+- 46576
+- 10118
+- 9584
+- 11828
+- 20541
+- 8985
+- 2125
+- 1070
+- 7700
+#Drama
+- 5763
+- 11
+- 3179
+- 6889
+- 4961
+- 3653
+- 500
+- 6616
+- 1255
+- 5012
+- 3947
+- 7243
+#Horror
+- 8711
+- 10944
+- 45028
+- 8654
+- 89585
+- 947
+- 6998
+- 8646
+- 42023
+- 52147
+- 75804
+- 75930
+- 75405
+generics:
+- https://www.netflix.com/
+output:
+  scrapedFileName: netflix.json
+  watchedFileName: watched.json
+filters:
+  clean:
+  - requestId
+  - unifiedEntityId
+  - liveEvent
+  - maturity
+  - mostLikedVideoId
+  - availability
+  - videoId
+  - userRatingRequestId
+  - numSeasonsLabel
+  - infoDensityRuntime
+  - titleMaturity
+  - boxArt
+  replace:
+  - source: boxArt.url
+    target: imageUrl
+  - source: titleMaturity.level
+    target: maturity

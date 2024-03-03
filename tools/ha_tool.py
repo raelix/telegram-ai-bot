@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic.v1 import Field
 from typing import List, Dict
 from langchain.chat_models.base import BaseChatModel
 from langchain.tools import Tool

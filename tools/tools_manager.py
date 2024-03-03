@@ -4,6 +4,7 @@ from settings.user_settings import UserSettings
 from tools.duckduckgo_tool import DuckDuckGoTool
 from tools.googlesearch_tool import GoogleSearchTool
 from tools.ha_tool import HATool
+from tools.movies_tool import MoviesTool
 from tools.tool_instance import ToolInstance
 
 
@@ -17,7 +18,8 @@ class ToolsManager:
         self.classes: Dict[str, Type[ToolInstance]] = dict(
             home_assistant=HATool,
             duckduckgo=DuckDuckGoTool,
-            googlesearch=GoogleSearchTool
+            googlesearch=GoogleSearchTool,
+            movies_tool=MoviesTool
         )
 
     def get_user_tools(self, **kwargs) -> List[Tool]:

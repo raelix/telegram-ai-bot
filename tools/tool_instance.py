@@ -1,5 +1,5 @@
 import abc
-from pydantic import Field, BaseModel, Extra
+from pydantic.v1 import Field, BaseModel, Extra
 from typing import List, Dict
 from langchain.tools import Tool
 from abc import abstractmethod

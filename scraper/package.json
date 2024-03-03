@@ -1,0 +1,19 @@
+{
+  "name": "netflix-scraper",
+  "version": "0.0.1",
+  "description": "A scraper for netflix by using puppeteer.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "raelix",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.11",
+    "lodash": "^4.17.21",
+    "operators": "^1.0.0",
+    "puppeteer": "^22.3.0",
+    "rxjs": "^7.8.1"
+  },
+  "type": "commonjs"
+}

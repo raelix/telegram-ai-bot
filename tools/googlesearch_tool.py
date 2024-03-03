@@ -1,7 +1,7 @@
 from typing import List, Dict
 from langchain.tools import Tool
 from pydantic import Field
-from langchain.utilities import GoogleSearchAPIWrapper
+from langchain_community.utilities import GoogleSearchAPIWrapper
 from tools.tool_instance import ToolInstance
 
 
