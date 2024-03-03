@@ -1,6 +1,6 @@
 from typing import List, Dict
 from langchain.tools import Tool
-from pydantic import Field
+from pydantic.v1 import Field
 from langchain_community.utilities import GoogleSearchAPIWrapper
 from tools.tool_instance import ToolInstance
 

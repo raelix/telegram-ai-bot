@@ -99,9 +99,12 @@ class TelDocBot:
         await c_message.delete()
         if "message_id" in output:
             msg_id = output["message_id"]
-            await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, reply_to_message_id=msg_id)
-        else:
-            await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, )
+            try:
+                await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, reply_to_message_id=msg_id)
+                return
+            except:
+                pass
+        await update.message.reply_text(response, parse_mode=ParseMode.MARKDOWN, )
 
     async def features(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         keyboard = [

@@ -19,6 +19,7 @@ import chromadb
 from vectorstore.vector_store_wrapper import VectorStoreWrapper
 
 
+@DeprecationWarning
 class AgentWrapper:
     _temperature: int = 0
     _max_win_memory: int = 3

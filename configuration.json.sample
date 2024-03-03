@@ -1,0 +1,8 @@
+{
+  "openai_api_key": "sk-*",
+  "region_name": "eu-west-1",
+  "aws_access_key_id": "ACCESS_KEY",
+  "aws_secret_access_key": "SECRET_KEY",
+  "bucket_name": "tel-doc-bot",
+  "telegram_bot_token": "6012287021:bot_token"
+}

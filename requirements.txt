@@ -9,3 +9,8 @@ pypika
 duckduckgo-search
 pydantic
 requests
+google-api-python-client
+fake_useragent
+langgraph
+amazon-textract-caller
+amazon-textract-textractor

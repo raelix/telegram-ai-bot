@@ -77,6 +77,7 @@ class VectorStoreWrapper:
             )
         for doc in documents:
             doc.metadata["message_id"] = msg_id
+            doc.page_content += f"\n\nmessage_id: {msg_id}"
         print('questions and summary created')
         self.db.vectorstore.add_documents(ret_docs)
         self.db.docstore.mset(list(zip(doc_ids, documents)))

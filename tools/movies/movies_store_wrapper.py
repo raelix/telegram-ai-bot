@@ -21,7 +21,8 @@ class MoviesStoreWrapper:
     db_path: str = "./movies_database"
 
     _NAME = "movies-retriever"
-    _DESCRIPTION = """Use this tool to retrieve information about movies."""
+    _DESCRIPTION = """Use this tool to retrieve information about movies from the database. This includes watched 
+    user movies, genres, release year, cast, actors and so on."""
 
     def __init__(self, openai_api_key: str, user_id: str, movies_handler: MoviesHandler, **kwargs):
         _set_logger()

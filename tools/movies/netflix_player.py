@@ -12,6 +12,8 @@ class NetflixPlayerTool(BaseTool):
     name = "netflix_player"
     description = """
         Use this tool to play a movie if the user requested to watch it.
+        Important: Never pass me the movie name but always the id of the movie (e.g. 81281344).
+        If you don't know you can try searching on web.
         """
     args_schema: Type[BaseModel] = NetflixPlayerToolInput
 

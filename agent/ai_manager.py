@@ -1,6 +1,6 @@
 from typing import List, Dict
 from langchain.schema import Document
-from agent.agent_wrapper import AgentWrapper
+from graph.agent import AgentWrapper
 
 
 class AIManager:

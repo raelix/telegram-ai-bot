@@ -5,6 +5,7 @@ from tools.duckduckgo_tool import DuckDuckGoTool
 from tools.googlesearch_tool import GoogleSearchTool
 from tools.ha_tool import HATool
 from tools.movies_tool import MoviesTool
+from tools.netflix_id_scraper_tool import NetflixIdDiscoveryCustomTool
 from tools.tool_instance import ToolInstance
 
 
@@ -19,7 +20,8 @@ class ToolsManager:
             home_assistant=HATool,
             duckduckgo=DuckDuckGoTool,
             googlesearch=GoogleSearchTool,
-            movies_tool=MoviesTool
+            movies_tool=MoviesTool,
+            netflix_id_scraper=NetflixIdDiscoveryCustomTool
         )
 
     def get_user_tools(self, **kwargs) -> List[Tool]:

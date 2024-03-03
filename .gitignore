@@ -7,10 +7,10 @@ __pycache__
 .idea
 *.ipynb
 netflix.json
-/scraper/config/production.yaml
-/scraper/node_modules
-/scraper/session
-/scraper/.DS_Store
-/scraper/scraped.json
-/scraper/watched.json
-/scraper/netflix.json
+/netflix-scraper/config/production.yaml
+/netflix-scraper/node_modules
+/netflix-scraper/session
+/netflix-scraper/.DS_Store
+/netflix-scraper/scraped.json
+/netflix-scraper/watched.json
+/netflix-scraper/netflix.json
