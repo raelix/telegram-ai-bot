@@ -12,8 +12,8 @@ class HaActionToolInput(BaseModel):
 
 
 class HaActionTool(BaseTool):
-    name = "home_assistant_action"
-    description = """
+    name:str = "home_assistant_action"
+    description:str = """
         Required when you have to execute an action on a entity of home-assistant.
         The entity_id, entity_type and the action must match with the ones provided by the entities-extractor tool.
         """

@@ -3,7 +3,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain.tools import Tool
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.agents.agent_toolkits import create_retriever_tool
 import logging
 from langchain.retrievers.multi_query import MultiQueryRetriever

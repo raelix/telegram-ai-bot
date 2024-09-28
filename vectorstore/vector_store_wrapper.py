@@ -2,7 +2,7 @@ from typing import List, Any
 from langchain_openai import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.tools import Tool
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.storage._lc_store import create_kv_docstore

@@ -31,8 +31,8 @@ class NetflixIdScraperToolInput(BaseModel):
 
 
 class NetflixIdDiscoveryTool(BaseTool):
-    name = "netflix_id_discovery"
-    description = """
+    name:str = "netflix_id_discovery"
+    description:str = """
         Use this tool to search the netflix id of a movie only when movies-retriever doesn't have a good answer.
         Always prefer to search first in the movies-retriever.
         The output will be the netflix id if found.

@@ -14,3 +14,7 @@ fake_useragent
 langgraph
 amazon-textract-caller
 amazon-textract-textractor
+langchain-chroma
+langchain-google-community
+pypdfium2 
+pdf2image

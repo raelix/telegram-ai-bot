@@ -70,8 +70,6 @@ class AgentWrapper:
         user_settings = UserSettings(self.user_id)
         self.tools_manager = ToolsManager(self.openai_api_key, self.user_id, user_settings)
         self.tools, self.tool_executor = self.init_tools(self.tools_manager, self.llm, self.db)
-        user_settings = UserSettings(self.user_id)
-        self.tools_manager = ToolsManager(self.openai_api_key, self.user_id, user_settings)
         self.model = self.init_model(self.tools)
         self.nodes = Nodes(self.model, self.tool_executor)
         self.graph = Graph(self.nodes)

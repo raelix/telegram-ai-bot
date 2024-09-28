@@ -3,7 +3,8 @@ from langchain.tools import Tool
 from settings.user_settings import UserSettings
 from tools.duckduckgo_tool import DuckDuckGoTool
 from tools.googlesearch_tool import GoogleSearchTool
-from tools.ha_tool import HATool
+# from tools.ha_tool import HATool
+from tools.ha_agent_tool import HAAgentTool
 from tools.movies_tool import MoviesTool
 from tools.netflix_id_scraper_tool import NetflixIdDiscoveryCustomTool
 from tools.tool_instance import ToolInstance
@@ -17,7 +18,8 @@ class ToolsManager:
         self.user_settings = user_settings
         self.instances: Dict[str, ToolInstance] = dict()
         self.classes: Dict[str, Type[ToolInstance]] = dict(
-            home_assistant=HATool,
+            # home_assistant=HATool,
+            home_assistant_ai=HAAgentTool,
             duckduckgo=DuckDuckGoTool,
             googlesearch=GoogleSearchTool,
             movies_tool=MoviesTool,
@@ -70,6 +72,7 @@ class ToolsManager:
 
     def get_tools_status(self):
         ret: Dict[str, bool] = dict()
+        print(f"Instances are: {self.instances}")
         for instance_name, instance in self.classes.items():
             ret[instance_name] = True if instance_name in self.instances else False
         return ret

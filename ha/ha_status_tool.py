@@ -9,8 +9,8 @@ class HaStatusToolInput(BaseModel):
 
 
 class HAStatusTool(BaseTool):
-    name = "home_assistant_status"
-    description = """
+    name:str = "home_assistant_status"
+    description:str = """
         Required when you have to get the status of an entity from home-assistant.
         The entity_id must match with the one provided by the entities-extractor tool.
         """
@@ -19,7 +19,6 @@ class HAStatusTool(BaseTool):
     def _run(self, entity_id: str):
         ha_handler: HAHandler = self.metadata["ha_handler"]
         status = ha_handler.get_entity_status(entity_id)
-        # attributes = ha_handler.get_entity_attributes(entity_id)
         if not status: #or not attributes:
             return ("Error while connecting to the home-assistant instance, "
                     "maybe the configuration is wrong")

@@ -1,2 +1,2 @@
-AGENT_MODEL = "gpt-3.5-turbo-1106"
+AGENT_MODEL = "gpt-4o"
 EMBEDDINGS_MODEL = "text-embedding-ada-002"
